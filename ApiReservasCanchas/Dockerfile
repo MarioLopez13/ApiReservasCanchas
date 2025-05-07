@@ -1,11 +1,20 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Etapa de construcción
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
-COPY *.csproj ./
+
+# Copia csproj y restaura dependencias
+COPY *.sln .
+COPY ApiReservasCanchas/*.csproj ./ApiReservasCanchas/
 RUN dotnet restore
-COPY . ./
+
+# Copia el resto de los archivos y publica
+COPY . .
+WORKDIR /app/ApiReservasCanchas
 RUN dotnet publish -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+# Imagen final
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build /app/out ./
+COPY --from=build /app/ApiReservasCanchas/out .
+ENV ASPNETCORE_URLS=http://+:80
 ENTRYPOINT ["dotnet", "ApiReservasCanchas.dll"]
