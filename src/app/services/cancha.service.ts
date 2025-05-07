@@ -13,7 +13,7 @@ export interface Cancha {
   providedIn: 'root'
 })
 export class CanchaService {
-  private apiUrl = 'http://localhost:5016/api/Cancha';
+  private apiUrl = 'https://apireservascanchas.onrender.com/api/Cancha';
 
   constructor(private http: HttpClient) {}
 

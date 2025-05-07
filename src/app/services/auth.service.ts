@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5016/api/Auth';
+  private apiUrl = 'https://apireservascanchas.onrender.com/api/Auth';
 
   constructor(private http: HttpClient) {}
 

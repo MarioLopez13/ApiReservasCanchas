@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class HorarioService {
-  private apiUrl = 'http://localhost:5016/api/Horario';
+  private apiUrl = 'https://apireservascanchas.onrender.com/api/Horario';
 
   constructor(private http: HttpClient) {}
 

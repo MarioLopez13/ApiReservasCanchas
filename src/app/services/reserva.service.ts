@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ReservaService {
-  private apiUrl = 'http://localhost:5016/api/Reserva';
+  private apiUrl = 'https://apireservascanchas.onrender.com/api/Reserva';
 
   constructor(private http: HttpClient) {}
 
