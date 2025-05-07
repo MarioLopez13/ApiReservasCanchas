@@ -4,6 +4,7 @@ using ApiReservasCanchas.Data;
 using ApiReservasCanchas.Models;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace ApiReservasCanchas.Controllers
 {
@@ -46,12 +47,8 @@ namespace ApiReservasCanchas.Controllers
                 return BadRequest("El correo ya está registrado.");
 
             // Hashear la contraseña antes de guardar
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = Encoding.UTF8.GetBytes(usuario.Contrasena);
-                var hash = sha256.ComputeHash(bytes);
-                usuario.Contrasena = Convert.ToBase64String(hash);
-            }
+            var hasher = new PasswordHasher<Usuario>();
+            usuario.Contrasena = hasher.HashPassword(usuario, usuario.Contrasena);
 
 
             _context.Usuarios.Add(usuario);

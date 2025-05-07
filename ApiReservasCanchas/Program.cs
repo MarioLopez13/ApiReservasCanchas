@@ -1,22 +1,35 @@
-using ApiReservasCanchas.Data;
+﻿using ApiReservasCanchas.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurar conexión a MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("MySqlConnection"),
-    ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MySqlConnection"))));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("MySqlConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MySqlConnection"))
+    ));
 
-// Add services to the container.
-
+// Configurar controladores y Swagger
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configurar CORS para permitir Angular
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuración del pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -24,6 +37,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAngularDev"); // Aquí aplicas CORS
 
 app.UseAuthorization();
 

@@ -4,6 +4,7 @@ using ApiReservasCanchas.Data;
 using ApiReservasCanchas.Models;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace ApiReservasCanchas.Controllers
 {
@@ -28,15 +29,12 @@ namespace ApiReservasCanchas.Controllers
                 return Unauthorized("Usuario no encontrado.");
 
             // Recalcular el hash
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = Encoding.UTF8.GetBytes(request.Contrasena);
-                var hash = sha256.ComputeHash(bytes);
-                var hashIngresado = Convert.ToBase64String(hash);
+            var hasher = new PasswordHasher<Usuario>();
+            var result = hasher.VerifyHashedPassword(usuario, usuario.Contrasena, request.Contrasena);
 
-                if (usuario.Contrasena != hashIngresado)
-                    return Unauthorized("Contraseña incorrecta.");
-            }
+            if (result != PasswordVerificationResult.Success)
+                return Unauthorized("Contraseña incorrecta.");
+
 
 
             // Login válido
