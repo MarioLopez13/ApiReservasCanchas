@@ -30,11 +30,10 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configuración del pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Habilita Swagger en desarrollo y producción
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
