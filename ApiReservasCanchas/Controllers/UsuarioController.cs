@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using ApiReservasCanchas.Data;
 using ApiReservasCanchas.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ApiReservasCanchas.Controllers
 {
@@ -42,6 +44,15 @@ namespace ApiReservasCanchas.Controllers
             var existe = await _context.Usuarios.AnyAsync(u => u.Email == usuario.Email);
             if (existe)
                 return BadRequest("El correo ya está registrado.");
+
+            // Hashear la contraseña antes de guardar
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(usuario.Contrasena);
+                var hash = sha256.ComputeHash(bytes);
+                usuario.Contrasena = Convert.ToBase64String(hash);
+            }
+
 
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();

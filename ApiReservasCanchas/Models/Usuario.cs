@@ -8,6 +8,7 @@
         public string Contrasena { get; set; }
         public string Rol { get; set; } // "admin" o "cliente"
 
+
         public ICollection<Reserva>? Reservas { get; set; }
 
     }
