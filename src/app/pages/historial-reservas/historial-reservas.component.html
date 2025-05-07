@@ -1,0 +1,30 @@
+<h2>Historial de Reservas por Usuario</h2>
+
+<label>Seleccionar Usuario:</label>
+<select [(ngModel)]="usuarioSeleccionado" (change)="cargarHistorial()">
+  <option [value]="0">-- Selecciona un usuario --</option>
+  <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nombre }}</option>
+</select>
+
+<table *ngIf="reservas.length > 0" border="1" style="margin-top: 20px;">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Hora Inicio</th>
+      <th>Hora Fin</th>
+      <th>Cancha</th>
+      <th>Estado</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of reservas">
+      <td>{{ r.fecha | date: 'shortDate' }}</td>
+      <td>{{ r.horaInicio }}</td>
+      <td>{{ r.horaFin }}</td>
+      <td>{{ r.canchaId }}</td>
+      <td>{{ r.estado }}</td>
+      <td>{{ r.precioFinal | currency:'USD' }}</td>
+    </tr>
+  </tbody>
+</table>

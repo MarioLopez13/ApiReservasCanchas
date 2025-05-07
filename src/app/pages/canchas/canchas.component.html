@@ -1,0 +1,31 @@
+<h2>Gestión de Canchas</h2>
+
+<input [(ngModel)]="nuevaCancha.nombre" placeholder="Nombre" />
+<input [(ngModel)]="nuevaCancha.tipo" placeholder="Tipo" />
+<input [(ngModel)]="nuevaCancha.ubicacion" placeholder="Ubicación" />
+<button (click)="agregarCancha()">Agregar Cancha</button>
+
+<ul>
+  <li *ngFor="let cancha of canchas">
+    <strong>{{ cancha.nombre }}</strong> - {{ cancha.tipo }} - {{ cancha.ubicacion }}
+    <button (click)="eliminarCancha(cancha.id)">Eliminar</button>
+    <button (click)="toggleHorarios(cancha.id)">
+      {{ mostrarHorarios[cancha.id] ? 'Ocultar' : 'Ver' }} Horarios
+    </button>
+
+    <div *ngIf="mostrarHorarios[cancha.id]">
+      <ul>
+        <li *ngFor="let h of horariosPorCancha[cancha.id]">
+          {{ h.horaInicio }} - {{ h.horaFin }} | Disponible: {{ h.disponible ? 'Sí' : 'No' }}
+          <button (click)="eliminarHorario(h.id, cancha.id)">Eliminar</button>
+        </li>
+      </ul>
+
+      <div>
+        <input [(ngModel)]="nuevoHorario.horaInicio" placeholder="Hora Inicio (HH:mm:ss)" />
+        <input [(ngModel)]="nuevoHorario.horaFin" placeholder="Hora Fin (HH:mm:ss)" />
+        <button (click)="agregarHorario(cancha.id)">Agregar Horario</button>
+      </div>
+    </div>
+  </li>
+</ul>

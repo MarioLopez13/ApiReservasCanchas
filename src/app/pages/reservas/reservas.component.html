@@ -1,0 +1,26 @@
+<h2>Crear Reserva</h2>
+
+<div *ngIf="mensaje" style="color: red;">{{ mensaje }}</div>
+
+<form (ngSubmit)="crearReserva()">
+  <label>Usuario:</label>
+  <select [(ngModel)]="nuevaReserva.usuarioId" name="usuarioId" required>
+    <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nombre }}</option>
+  </select>
+
+  <label>Cancha:</label>
+  <select [(ngModel)]="nuevaReserva.canchaId" name="canchaId" required>
+    <option *ngFor="let c of canchas" [value]="c.id">{{ c.nombre }}</option>
+  </select>
+
+  <label>Fecha:</label>
+  <input type="date" [(ngModel)]="nuevaReserva.fecha" name="fecha" required>
+
+  <label>Hora Inicio:</label>
+  <input type="time" [(ngModel)]="nuevaReserva.horaInicio" name="horaInicio" required>
+
+  <label>Hora Fin:</label>
+  <input type="time" [(ngModel)]="nuevaReserva.horaFin" name="horaFin" required>
+
+  <button type="submit">Reservar</button>
+</form>
