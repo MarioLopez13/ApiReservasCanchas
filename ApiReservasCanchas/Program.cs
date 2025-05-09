@@ -42,7 +42,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-// 6) Habilito Swagger siempre
+// 6) Habilito Swagger siempres
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
