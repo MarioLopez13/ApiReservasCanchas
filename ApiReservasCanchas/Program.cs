@@ -3,31 +3,31 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1) Configuración de archivos + env vars
+// 1) Cargo appsettings + appsettings.{Env}.json + env vars
 builder.Configuration
        .SetBasePath(builder.Environment.ContentRootPath)
        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-       .AddEnvironmentVariables();
+       .AddEnvironmentVariables(); // aquí lee ConnectionStrings__MySqlConnection
 
-// 2) Registro de DbContext con la cadena correcta
+// 2) Leo la cadena (de env var en producción o de appsettings.json en local)
 var conn = builder.Configuration.GetConnectionString("MySqlConnection")!;
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseMySql(conn, ServerVersion.AutoDetect(conn))
 );
 
-// 3) Web API + Swagger
+// 3) Agrego controladores y Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 4) CORS: permitimos local y ambos dominios prod (API y Front)
+// 4) CORS: dev local + tu front estático en Render + tu API en Render
 builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", p =>
 {
     p.WithOrigins(
-        "http://localhost:4200",                         // Angular dev
-        "https://apireservascanchas-1.onrender.com",     // tu front en Render
-        "https://apireservascanchas.onrender.com"        // tu API en Render (si la consumen otros clientes)
+        "http://localhost:4200",                         // Angular en local
+        "https://apireservascanchas-1.onrender.com",     // tu front estático
+        "https://apireservascanchas.onrender.com"        // consumido desde otros clientes
     )
     .AllowAnyHeader()
     .AllowAnyMethod()
@@ -36,18 +36,18 @@ builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", p =>
 
 var app = builder.Build();
 
-// 5) Solo en Dev mostrar exception page
+// 5) En dev mostramos detalles de excepción
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 
-// 6) Swagger siempre disponible
+// 6) Habilito Swagger siempre
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Reservas V1");
-    c.RoutePrefix = "swagger";
+    c.RoutePrefix = "swagger";  // accederás en /swagger/index.html
 });
 
 // 7) HTTPS redirection y CORS
