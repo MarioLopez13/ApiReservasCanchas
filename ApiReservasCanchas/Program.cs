@@ -3,44 +3,58 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar conexión a MySQL
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("MySqlConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MySqlConnection"))
-    ));
+// 1) Configuración de archivos + env vars
+builder.Configuration
+       .SetBasePath(builder.Environment.ContentRootPath)
+       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+       .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+       .AddEnvironmentVariables();
 
-// Configurar controladores y Swagger
+// 2) Registro de DbContext con la cadena correcta
+var conn = builder.Configuration.GetConnectionString("MySqlConnection")!;
+builder.Services.AddDbContext<ApplicationDbContext>(opts =>
+    opts.UseMySql(conn, ServerVersion.AutoDetect(conn))
+);
+
+// 3) Web API + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configurar CORS para permitir Angular
-builder.Services.AddCors(options =>
+// 4) CORS: permitimos local y ambos dominios prod (API y Front)
+builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", p =>
 {
-    options.AddPolicy("AllowAngularDev", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
-});
+    p.WithOrigins(
+        "http://localhost:4200",                         // Angular dev
+        "https://apireservascanchas-1.onrender.com",     // tu front en Render
+        "https://apireservascanchas.onrender.com"        // tu API en Render (si la consumen otros clientes)
+    )
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials();
+}));
 
 var app = builder.Build();
 
-// Configuración del pipeline
-// Habilita Swagger en desarrollo y producción
+// 5) Solo en Dev mostrar exception page
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+// 6) Swagger siempre disponible
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Reservas V1");
+    c.RoutePrefix = "swagger";
+});
 
-
+// 7) HTTPS redirection y CORS
 app.UseHttpsRedirection();
-
-app.UseCors("AllowAngularDev"); // Aquí aplicas CORS
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
